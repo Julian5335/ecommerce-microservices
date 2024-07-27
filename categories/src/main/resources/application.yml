@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: categories
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

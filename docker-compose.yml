@@ -1,0 +1,49 @@
+version: '0.0.1'
+
+services:
+
+  # Categories Database
+  categories_db:
+    image: mysql:8.0
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $MYSQL_CATEGORIES_PORT:$MYSQL_DOCKER_PORT
+    environment:
+      MYSQL_DATABASE: $MYSQL_CATEGORIES_DATABASE
+      MYSQL_USER: $MYSQL_CATEGORIES_USERNAME
+      MYSQL_PASSWORD: $MYSQL_CATEGORIES_PASSWORD
+      MYSQL_RANDOM_ROOT_PASSWORD: true
+    volumes:
+      - ${MYSQL_VOLUME_FOLDER}/categories:/var/lib/mysql
+    networks:
+      - ecommerce
+
+  # Config server
+  config:
+    image: julian5335/ecommerce-microservices-config:0.0.1
+    restart: on-failure
+    env_file: ./.env
+    ports:
+      - $CONFIG_PORT:$SPRING_DOCKER_PORT
+    networks:
+      - ecommerce
+  
+  # Categories microservice
+  categories:
+    depends_on:
+      - categories_db
+      - config
+    image: julian5335/ecommerce-microservices-categories:0.0.1
+    restart: on-failure
+    env_file: ./.env
+    ports:
+      - $CATEGORIES_PORT:$SPRING_DOCKER_PORT
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config:$SPRING_DOCKER_PORT/
+    networks:
+      - ecommerce
+
+networks:
+  ecommerce:
+    driver: bridge

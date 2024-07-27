@@ -1,0 +1,8 @@
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    url: jdbc:mysql://categories_db:3306/categories_db
+    username: user
+    password: password
